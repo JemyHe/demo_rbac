@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingxue.mapper.OrderMapper">
+	<select id="findBy" resultMap="OrderMap">
+		select id,customer_id,org_id,total from demo_rbac_order 
+		where customer_id=${customerId} and org_id in
+		<foreach collection="orgIds" open="(" close=")" separator="," item="id">#{id}</foreach>
+	</select>
+
+	<select id="findAll" resultMap="OrderMap">
+		select id,customer_id,org_id,total from demo_rbac_order 
+		where org_id in
+		<foreach collection="orgIds" open="(" close=")" separator="," item="id">#{id}</foreach>
+	</select>
+	
+	<resultMap type="com.xingxue.entity.Order" id="OrderMap">
+		<id column="id" property="id" />
+		<result column="customer_id" property="customerId" />
+		<result column="org_id" property="orgId" />
+		<result column="total" property="total" />
+	</resultMap>
+</mapper>

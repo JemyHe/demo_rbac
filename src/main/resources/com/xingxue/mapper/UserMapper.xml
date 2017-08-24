@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingxue.mapper.UserMapper">
+
+	<select id="findUserWithRoleAndModuleAndOrg" resultMap="UserMap">
+		select a.id,a.username,a.password,a.org_id,a.org_ids,
+			   b.id b_id,b.name b_name,
+			   c.id c_id,c.name c_name,c.pid c_pid,c.code c_code
+			from demo_rbac_user a 
+			left join demo_rbac_user_role ab on a.id=ab.user_id 
+			left join demo_rbac_role b on ab.role_id=b.id
+			left join demo_rbac_role_module bc on b.id=bc.role_id
+			left join demo_rbac_module c on bc.module_id=c.id
+			where a.username=#{username} and a.password=#{password}			
+	</select>
+	<resultMap type="com.xingxue.entity.User" id="UserMap">
+		<id column="id" property="id"/>
+		<result column="username" property="username"/>
+		<result column="password" property="password"/>
+		<result column="org_id" property="orgId"/>
+		<result column="org_ids" property="orgIds"/>
+		<collection property="roles" ofType="com.xingxue.entity.Role">
+			<id column="b_id" property="id"/>
+			<result column="b_name" property="name"/>
+			<collection property="modules" ofType="com.xingxue.entity.Module">
+				<id column="c_id" property="id"/>
+				<result column="c_name" property="name"/>
+				<result column="c_pid" property="pid"/>
+				<result column="c_code" property="code"/>
+			</collection>
+		</collection>		
+	</resultMap>
+
+	<insert id="insertUserRole">
+		insert into demo_rbac_user_role(user_id,role_id) values(#{userId},#{roleId})
+	</insert>
+	
+	<delete id="deleteUserRole">
+		delete from demo_rbac_user_role where user_id=#{userId}
+	</delete>
+	
+	<select id="findByOrgId" parameterType="int" resultMap="SimpleUserMap">
+		select a.id,a.username,a.password,a.org_id,a.org_ids from demo_rbac_user a where org_id=#{orgId}
+	</select>
+	
+	<resultMap type="com.xingxue.entity.User" id="SimpleUserMap">
+		<id column="id" property="id"/>
+		<result column="username" property="username"/>
+		<result column="password" property="password"/>
+		<result column="org_id" property="orgId"/>
+		<result column="org_ids" property="orgIds"/>
+	</resultMap>
+	
+	<select id="findById" resultMap="UserMap">
+		select a.id,a.username,a.password,a.org_id,a.org_ids,
+			   b.id b_id,b.name b_name,
+			   c.id c_id,c.name c_name,c.pid c_pid,c.code c_code
+			from demo_rbac_user a 
+			left join demo_rbac_user_role ab on a.id=ab.user_id 
+			left join demo_rbac_role b on ab.role_id=b.id
+			left join demo_rbac_role_module bc on b.id=bc.role_id
+			left join demo_rbac_module c on bc.module_id=c.id
+			where a.id=#{id}		
+	</select>
+	
+	<update id="updateUserOrgs" parameterType="com.xingxue.entity.User">
+		update demo_rbac_user set org_ids=#{orgIds} where id=#{id}
+	</update>
+</mapper>

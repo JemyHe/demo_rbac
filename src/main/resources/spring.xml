@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd 
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd 
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd 
+	http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd 
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+	<context:property-placeholder location="classpath:application.properties" />
+
+	<!-- 1) 管理数据源 -->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+
+
+	<!-- 2) sqlSessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="typeHandlers">
+			<list>
+				<bean class="org.yihang.ext.mybatis.StringIntArrayTypeHandler"></bean>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 3) 配置mapper接口 -->
+	<bean id="mapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.xingxue.mapper" />
+	</bean>
+
+	<!-- 4) 搜索service -->
+	<context:component-scan base-package="com.xingxue.service" />
+
+	<!-- 5) 事务控制 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<!-- 6) 搜索切面类 -->
+	<context:component-scan base-package="com.xingxue.aspect" />
+
+	<!-- 7) 启用aop注解和相关类 -->
+	<aop:aspectj-autoproxy proxy-target-class="true" />
+
+	<!-- 8) 搜索bean的后处理器 -->
+	<context:component-scan base-package="com.xingxue.processor" />
+
+	<!-- 9) 搜索Controller -->
+	<context:component-scan base-package="com.xingxue.controller" />
+
+	<!-- 10) 配置视图解析器 -->
+	<mvc:view-resolvers>
+		<mvc:jsp prefix="/WEB-INF/" suffix=".jsp" />
+	</mvc:view-resolvers>
+
+	<!-- 11) 启用springmvc相关注解 -->
+	<mvc:annotation-driven />
+
+	<!-- 12) 解决静态资源404问题 -->
+	<mvc:default-servlet-handler />
+	
+	<!-- 13) 配置拦截器 -->
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/"/>
+			<mvc:mapping path="/index"/>
+			<mvc:mapping path="/index.*"/>
+			<mvc:mapping path="/system/**"/>
+			<mvc:mapping path="/order/**"/>
+			<mvc:mapping path="/product/**"/>
+			<bean class="com.xingxue.interceptor.LoginInterceptor"/>
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/system/**"/>
+			<mvc:mapping path="/order/**"/>
+			<mvc:mapping path="/product/**"/>
+			<bean class="com.xingxue.interceptor.ModuleInterceptor"/>
+		</mvc:interceptor>
+	</mvc:interceptors>
+
+</beans>

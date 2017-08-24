@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingxue.mapper.ModuleMapper">
+	<select id="findAll" resultMap="ModuleMap">
+		select a.id,a.name,a.pid,a.code,b.id b_id,b.name b_name,b.pid b_pid,b.code b_code
+		from demo_rbac_module a
+		left join demo_rbac_module b on a.id = b.pid
+		where a.pid=0
+	</select>
+	<resultMap type="com.xingxue.entity.Module" id="ModuleMap">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="pid" property="pid" />
+		<result column="code" property="code" />
+		<collection property="children" ofType="com.xingxue.entity.Module">
+			<id column="b_id" property="id" />
+			<result column="b_name" property="name" />
+			<result column="b_pid" property="pid" />
+			<result column="b_code" property="code" />
+		</collection>
+	</resultMap>
+
+	<select id="findByPid" resultType="com.xingxue.entity.Module">
+		select id,name,pid,code from
+		demo_rbac_module where pid=#{pid}
+	</select>
+	
+	<select id="findByRoleId" resultType="int" parameterType="int">
+		select module_id from demo_rbac_role_module where role_id=#{roleId}
+	</select>
+</mapper>
