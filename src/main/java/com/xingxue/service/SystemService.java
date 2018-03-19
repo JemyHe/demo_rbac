@@ -46,6 +46,11 @@ public class SystemService {
 		return roleMapper.findAll();
 	}
 
+	/**
+	 * 更新用户权限
+	 * @param userId
+	 * @param roleIds
+	 */
 	@Transactional
 	public void updateUserRoles(int userId, List<Integer> roleIds) {
 		userMapper.deleteUserRole(userId);
@@ -53,22 +58,37 @@ public class SystemService {
 			userMapper.insertUserRole(userId, roleId);
 		}		
 	}
-	
+
+	/**
+	 * 更新用户组织
+	 * @param userId
+	 * @param orgIds
+	 */
 	public void updateUserOrgs(int userId, Integer[] orgIds) {
 		User user = new User();
 		user.setId(userId);
 		user.setOrgIds(orgIds);
 		userMapper.updateUserOrgs(user);
 	}
-	
+
 	public List<Module> findModules() {
 		return moduleMapper.findAll();
 	}
-	
+
+	/**
+	 * 查询某个权限下所有模块
+	 * @param roleId
+	 * @return
+	 */
 	public List<Integer> findModulesByRoleId(int roleId) {
 		return moduleMapper.findByRoleId(roleId);
 	}
 
+	/**
+	 * 更新某个权限下所有模块
+	 * @param roleId
+	 * @param moduleIds
+	 */
 	@Transactional
 	public void updateRoleModules(int roleId, Integer[] moduleIds) {
 		roleMapper.deleteRoleModule(roleId);

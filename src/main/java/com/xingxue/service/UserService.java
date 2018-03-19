@@ -19,10 +19,20 @@ public class UserService {
 	@Autowired
 	private ModuleMapper moduleMapper;
 
+	/**
+	 * 登录并查询出该用户所有角色和权限
+	 * @param username
+	 * @param password
+	 * @return
+	 */
 	public User findUser(String username, String password) {
 		return userMapper.findUserWithRoleAndModuleAndOrg(username, password);
 	}
-	
+
+	/**
+	 * 查询出所有根级目录
+	 * @return
+	 */
 	public List<Module> findModules() {
 		return moduleMapper.findAll();
 	}
